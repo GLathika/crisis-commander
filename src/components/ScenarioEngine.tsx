@@ -1,8 +1,9 @@
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, RotateCcw } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import TypewriterText from "./TypewriterText";
 import OutcomeScreen from "./OutcomeScreen";
+import heroCharacter from "@/assets/hero-character.png";
 import type { Scenario, ScenarioNode } from "@/data/scenarios";
 
 interface ScenarioEngineProps {
@@ -10,12 +11,41 @@ interface ScenarioEngineProps {
   onExit: () => void;
 }
 
+const poseAnimations: Record<string, { animate: object; transition: object }> = {
+  alert: {
+    animate: { y: [0, -8, 0], scale: [1, 1.03, 1] },
+    transition: { repeat: Infinity, duration: 2, ease: "easeInOut" },
+  },
+  running: {
+    animate: { x: [0, 15, 0, -15, 0], y: [0, -20, 0, -20, 0], rotate: [0, 5, 0, -5, 0] },
+    transition: { repeat: Infinity, duration: 0.8, ease: "easeInOut" },
+  },
+  thinking: {
+    animate: { y: [0, -5, 0], rotate: [0, -3, 0, 3, 0] },
+    transition: { repeat: Infinity, duration: 3, ease: "easeInOut" },
+  },
+  pointing: {
+    animate: { x: [0, 10, 0], scale: [1, 1.05, 1] },
+    transition: { repeat: Infinity, duration: 1.5, ease: "easeInOut" },
+  },
+  ducking: {
+    animate: { y: [0, 15, 10], scale: [1, 0.85, 0.88], rotate: [0, -5, -3] },
+    transition: { repeat: Infinity, duration: 2, ease: "easeInOut" },
+  },
+  celebrating: {
+    animate: { y: [0, -25, 0], scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] },
+    transition: { repeat: Infinity, duration: 1.2, ease: "easeInOut" },
+  },
+};
+
 const ScenarioEngine = ({ scenario, onExit }: ScenarioEngineProps) => {
   const [currentNodeId, setCurrentNodeId] = useState(scenario.startNodeId);
   const [textComplete, setTextComplete] = useState(false);
   const [showOutcome, setShowOutcome] = useState(false);
 
   const currentNode: ScenarioNode = scenario.nodes[currentNodeId];
+  const pose = currentNode.characterPose || "alert";
+  const poseAnim = poseAnimations[pose] || poseAnimations.alert;
 
   const handleChoice = useCallback((nextNodeId: string) => {
     setTextComplete(false);
@@ -54,6 +84,46 @@ const ScenarioEngine = ({ scenario, onExit }: ScenarioEngineProps) => {
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Animated Hero Character */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={`char-${currentNodeId}`}
+          className="absolute bottom-28 right-4 md:right-8 z-50 pointer-events-none"
+          initial={{ opacity: 0, x: 80, scale: 0.5 }}
+          animate={{ opacity: 1, x: 0, scale: 1 }}
+          exit={{ opacity: 0, x: 80, scale: 0.5 }}
+          transition={{ duration: 0.6, type: "spring", stiffness: 150 }}
+        >
+          {/* Glow aura behind character */}
+          <motion.div
+            className="absolute inset-0 -m-6 rounded-full blur-2xl"
+            style={{
+              background: currentNode.outcome === "failure"
+                ? "radial-gradient(circle, hsl(0 85% 55% / 0.3), transparent)"
+                : currentNode.outcome === "survival"
+                ? "radial-gradient(circle, hsl(145 70% 45% / 0.3), transparent)"
+                : "radial-gradient(circle, hsl(35 95% 55% / 0.25), transparent)",
+            }}
+            animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
+            transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
+          />
+          <motion.img
+            src={heroCharacter}
+            alt="Response Operative"
+            className="h-[160px] md:h-[220px] lg:h-[280px] w-auto drop-shadow-2xl"
+            animate={poseAnim.animate as any}
+            transition={poseAnim.transition as any}
+            style={{
+              filter: currentNode.outcome === "failure"
+                ? "drop-shadow(0 0 25px hsl(0 85% 55% / 0.5)) hue-rotate(-10deg)"
+                : currentNode.outcome === "survival"
+                ? "drop-shadow(0 0 25px hsl(145 70% 45% / 0.5))"
+                : "drop-shadow(0 0 30px hsl(35 95% 55% / 0.4))",
+            }}
+          />
         </motion.div>
       </AnimatePresence>
 
