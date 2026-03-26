@@ -114,8 +114,8 @@ const ScenarioEngine = ({ scenario, onExit }: ScenarioEngineProps) => {
             src={heroCharacter}
             alt="Response Operative"
             className="h-[160px] md:h-[220px] lg:h-[280px] w-auto drop-shadow-2xl"
-            animate={poseAnim.animate}
-            transition={poseAnim.transition}
+            animate={poseAnim.animate as any}
+            transition={poseAnim.transition as any}
             style={{
               filter: currentNode.outcome === "failure"
                 ? "drop-shadow(0 0 25px hsl(0 85% 55% / 0.5)) hue-rotate(-10deg)"
