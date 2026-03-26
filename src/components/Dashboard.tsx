@@ -92,7 +92,7 @@ const Dashboard = ({ onStartScenario }: DashboardProps) => {
                 </div>
                 <div className="w-px h-8 bg-border" />
                 <div className="text-center">
-                  <div className="font-display text-2xl text-danger">2</div>
+                  <div className="font-display text-2xl text-danger">7</div>
                   <div className="font-body text-xs text-muted-foreground uppercase tracking-wider">Active Scenarios</div>
                 </div>
                 <div className="w-px h-8 bg-border" />
