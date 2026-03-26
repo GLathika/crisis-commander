@@ -1,16 +1,26 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import { AnimatePresence } from "framer-motion";
+import Dashboard from "@/components/Dashboard";
+import ScenarioEngine from "@/components/ScenarioEngine";
+import type { Scenario } from "@/data/scenarios";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+const Index = () => {
+  const [activeScenario, setActiveScenario] = useState<Scenario | null>(null);
+
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
-    </div>
+    <>
+      <Dashboard onStartScenario={setActiveScenario} />
+      <AnimatePresence>
+        {activeScenario && (
+          <ScenarioEngine
+            key={activeScenario.id}
+            scenario={activeScenario}
+            onExit={() => setActiveScenario(null)}
+          />
+        )}
+      </AnimatePresence>
+    </>
   );
 };
-
-const Index = PlaceholderIndex;
 
 export default Index;
